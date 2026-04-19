@@ -22,15 +22,33 @@ export const galleryItemType = defineType({
       ],
     }),
     defineField({
+      name: "captionTitle",
+      title: "Caption title",
+      description: "Short label shown in olive above the description.",
+      type: "string",
+    }),
+    defineField({
+      name: "captionDescription",
+      title: "Caption description",
+      description: "Longer line shown in muted text below the title.",
+      type: "text",
+      rows: 3,
+    }),
+    defineField({
       name: "caption",
-      title: "Caption",
+      title: "Caption (legacy)",
+      description: "Deprecated — use caption title + description. Still shown if new fields are empty.",
       type: "string",
     }),
   ],
   preview: {
-    select: { title: "caption", media: "image" },
-    prepare({ title, media }) {
-      return { title: title || "Gallery item", media };
+    select: {
+      capTitle: "captionTitle",
+      cap: "caption",
+      media: "image",
+    },
+    prepare({ capTitle, cap, media }) {
+      return { title: capTitle || cap || "Gallery item", media };
     },
   },
 });

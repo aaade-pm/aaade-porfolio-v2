@@ -1,56 +1,33 @@
-import Image from "next/image";
-
+import { GalleryMasonryGrid } from "@/components/gallery/gallery-masonry-grid";
 import { Container } from "@/components/ui/container";
-import { Heading } from "@/components/ui/heading";
-import { Section } from "@/components/ui/section";
-import { Text } from "@/components/ui/text";
-import { getGalleryImages, urlForImage } from "@/lib/sanity";
+import { getGalleryImages, getSiteSettings } from "@/lib/sanity";
 
 export default async function GalleryPage() {
-  const items = await getGalleryImages();
+  const [items, settings] = await Promise.all([
+    getGalleryImages(),
+    getSiteSettings(),
+  ]);
 
   return (
-    <Section>
-      <Container>
-        <Heading level={1}>Gallery</Heading>
-        <Text muted className="mt-2">
-          Life moments with captions from Sanity.
-        </Text>
+    <section className="min-h-screen bg-black px-6 py-24 text-foreground md:px-12 md:py-32">
+      <Container className="max-w-7xl">
+        <div className="mb-16 md:mb-20">
+          <h1 className="font-display mb-4 text-4xl font-bold text-white md:text-6xl">
+            Gallery
+          </h1>
+          <p className="max-w-lg whitespace-pre-line text-zinc-500">
+            {settings.lifeDescription}
+          </p>
+        </div>
 
         {!items.length ? (
-          <Text muted className="mt-10">
-            No gallery items yet. Add documents in Sanity Studio.
-          </Text>
+          <p className="whitespace-pre-line text-zinc-500">
+            {settings.lifeEmptyMessage}
+          </p>
         ) : (
-          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((item) => {
-              const src = item.image
-                ? urlForImage(item.image)?.width(900).height(900).url()
-                : null;
-              return (
-                <li key={item._id} className="space-y-3">
-                  {src ? (
-                    <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-surface">
-                      <Image
-                        src={src}
-                        alt={item.image?.alt ?? item.caption ?? "Gallery image"}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, 33vw"
-                      />
-                    </div>
-                  ) : null}
-                  {item.caption ? (
-                    <Text size="sm" muted>
-                      {item.caption}
-                    </Text>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
+          <GalleryMasonryGrid items={items} />
         )}
       </Container>
-    </Section>
+    </section>
   );
 }

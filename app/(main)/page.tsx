@@ -7,16 +7,16 @@ import { LifeGallerySection } from "@/components/sections/life-gallery-section";
 import {
   getArchivedProjects,
   getFeaturedProjects,
-  getGalleryImages,
+  getLifeGalleryPreview,
   getSiteSettings,
 } from "@/lib/sanity";
 
 export default async function HomePage() {
-  const [settings, featured, archived, gallery] = await Promise.all([
+  const [settings, featured, archived, lifeGallery] = await Promise.all([
     getSiteSettings(),
     getFeaturedProjects(),
     getArchivedProjects(),
-    getGalleryImages(),
+    getLifeGalleryPreview(),
   ]);
 
   return (
@@ -45,10 +45,11 @@ export default async function HomePage() {
         />
       </section>
       <LifeGallerySection
-        items={gallery}
+        items={lifeGallery}
         title={settings.lifeTitle}
         description={settings.lifeDescription}
         emptyMessage={settings.lifeEmptyMessage}
+        galleryCtaLabel={settings.lifeGalleryCtaLabel}
       />
       <AboutSection settings={settings} />
     </div>

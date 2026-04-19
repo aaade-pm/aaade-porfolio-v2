@@ -239,6 +239,29 @@ export const siteSettingsType = defineType({
       rows: 2,
       group: "life",
     }),
+    defineField({
+      name: "lifeGalleryCtaLabel",
+      title: "Life section — link to full gallery",
+      description:
+        'Pill button under the preview grid (same style as “Browse archive”). Links to /gallery.',
+      type: "string",
+      initialValue: "See more",
+      group: "life",
+    }),
+    defineField({
+      name: "lifeGalleryItems",
+      title: "Beyond code — photos to show",
+      description:
+        "Pick gallery items and drag to set order for the home and /life preview. Leave empty to show every gallery item (newest first). The /gallery page always lists all items.",
+      type: "array",
+      group: "life",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          to: [{ type: "galleryItem" }],
+        }),
+      ],
+    }),
 
     defineField({
       name: "aboutEyebrow",

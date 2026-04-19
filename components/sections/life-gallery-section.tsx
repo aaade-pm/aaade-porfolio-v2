@@ -1,7 +1,8 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
+import { GalleryMasonryGrid } from "@/components/gallery/gallery-masonry-grid";
 import { Container } from "@/components/ui/container";
-import { urlForImage } from "@/lib/sanity";
 import type { GalleryItem } from "@/types/sanity";
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
   title: string;
   description: string;
   emptyMessage: string;
+  galleryCtaLabel: string;
 };
 
 export function LifeGallerySection({
@@ -16,6 +18,7 @@ export function LifeGallerySection({
   title,
   description,
   emptyMessage,
+  galleryCtaLabel,
 }: Props) {
   return (
     <section
@@ -24,7 +27,7 @@ export function LifeGallerySection({
     >
       <Container className="max-w-7xl">
         <div className="mb-16 md:mb-20">
-          <h2 className="font-display mb-4 text-4xl font-bold md:text-6xl">
+          <h2 className="font-display mb-4 text-4xl font-bold text-white md:text-6xl">
             {title}
           </h2>
           <p className="max-w-lg whitespace-pre-line text-zinc-500">
@@ -35,37 +38,21 @@ export function LifeGallerySection({
         {items.length === 0 ? (
           <p className="whitespace-pre-line text-zinc-500">{emptyMessage}</p>
         ) : (
-          <div className="columns-1 gap-6 space-y-6 sm:columns-2 lg:columns-3">
-            {items.map((item) => {
-              const src = item.image
-                ? urlForImage(item.image)?.width(700).height(900).url()
-                : null;
-              if (!src) return null;
-              return (
-                <div
-                  key={item._id}
-                  className="group relative mb-6 break-inside-avoid overflow-hidden rounded-2xl shadow-2xl"
-                >
-                  <Image
-                    src={src}
-                    alt={
-                      item.image?.alt ?? item.caption ?? "Gallery photograph"
-                    }
-                    width={700}
-                    height={900}
-                    className="h-auto w-full grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
-                  />
-                  {item.caption ? (
-                    <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 opacity-0 transition-opacity group-hover:opacity-100">
-                      <p className="text-sm text-white italic">
-                        {item.caption}
-                      </p>
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
+          <>
+            <GalleryMasonryGrid items={items} />
+            <div className="mt-20 flex justify-center">
+              <Link
+                href="/gallery"
+                className="group font-display flex items-center gap-2 rounded-full border border-primary px-8 py-4 text-lg tracking-widest text-primary uppercase transition-all duration-300 hover:bg-primary hover:text-white"
+              >
+                {galleryCtaLabel}
+                <ArrowRight
+                  className="size-5 transition-transform group-hover:translate-x-1"
+                  aria-hidden
+                />
+              </Link>
+            </div>
+          </>
         )}
       </Container>
     </section>

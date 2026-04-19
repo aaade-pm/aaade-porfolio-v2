@@ -142,11 +142,22 @@ const projectSlugsOrderedQuery =
     title
   }`;
 
-const galleryQuery = groq`*[_type == "galleryItem"] | order(_createdAt desc) {
+const galleryItemProjection = `{
   _id,
   image,
-  caption
+  caption,
+  captionTitle,
+  captionDescription,
+  "assetWidth": image.asset->metadata.dimensions.width,
+  "assetHeight": image.asset->metadata.dimensions.height
 }`;
+
+const galleryQuery =
+  groq`*[_type == "galleryItem"] | order(_createdAt desc) ${galleryItemProjection}`;
+
+const lifeGalleryPreviewQuery = groq`*[_type == "siteSettings"] | order(_updatedAt desc)[0] {
+  "curated": lifeGalleryItems[]-> ${galleryItemProjection}
+}.curated`;
 
 /** Single site settings doc; `_id` may be a UUID (not `siteSettings`). */
 const siteSettingsQuery =
@@ -299,9 +310,46 @@ export async function getNextProjectBySlug(
   return rows[i + 1] ?? null;
 }
 
+function normalizeGalleryItems(raw: GalleryItem[]): GalleryItem[] {
+  return raw
+    .filter((item) => item != null && item._id)
+    .map((item) => ({
+      ...item,
+      caption: item.caption ?? null,
+      captionTitle: item.captionTitle ?? null,
+      captionDescription: item.captionDescription ?? null,
+      assetWidth: item.assetWidth ?? null,
+      assetHeight: item.assetHeight ?? null,
+    }))
+    .filter((item) => item.image != null);
+}
+
 export async function getGalleryImages(): Promise<GalleryItem[]> {
   if (!isSanityConfigured()) return [];
-  return getClient().fetch(galleryQuery, {}, fetchOptions);
+  const raw = await getClient().fetch<GalleryItem[]>(
+    galleryQuery,
+    {},
+    fetchOptions,
+  );
+  return normalizeGalleryItems(raw);
+}
+
+/**
+ * Items for the Beyond code section on home and /life.
+ * Uses Site settings → Beyond code → “photos to show” when set; otherwise all gallery items (newest first).
+ */
+export async function getLifeGalleryPreview(): Promise<GalleryItem[]> {
+  if (!isSanityConfigured()) return [];
+  const curated = await getClient().fetch<GalleryItem[] | null>(
+    lifeGalleryPreviewQuery,
+    {},
+    fetchOptions,
+  );
+  const normalized = normalizeGalleryItems(curated ?? []);
+  if (normalized.length > 0) {
+    return normalized;
+  }
+  return getGalleryImages();
 }
 
 export const getSiteSettings = cache(
