@@ -1,13 +1,14 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { RichText } from "@/components/portable-text";
-import { Container } from "@/components/ui/container";
-import { Heading } from "@/components/ui/heading";
-import { Section } from "@/components/ui/section";
-import { Text } from "@/components/ui/text";
-import { getPostBySlug, urlForImage } from "@/lib/sanity";
+import { ArticleDetail } from "@/components/blog/article-detail";
+import { ArticleReadingProgress } from "@/components/blog/article-reading-progress";
+import { GrainOverlay } from "@/components/sections/grain-overlay";
+import {
+  getPostBySlug,
+  getRelatedPosts,
+  urlForImage,
+} from "@/lib/sanity";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -15,9 +16,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return { title: "Post" };
+
+  const ogImage = post.coverImage
+    ? urlForImage(post.coverImage)?.width(1200).height(630).url()
+    : undefined;
+
   return {
     title: post.title,
-    description: post.category ?? undefined,
+    description: post.excerpt ?? post.category ?? undefined,
+    openGraph: ogImage
+      ? {
+          images: [{ url: ogImage, alt: post.coverImage?.alt ?? post.title }],
+        }
+      : undefined,
   };
 }
 
@@ -27,48 +38,15 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) notFound();
 
-  const coverUrl = post.coverImage
-    ? urlForImage(post.coverImage)?.width(1600).height(900).url()
-    : null;
+  const relatedPosts = await getRelatedPosts(post._id, post.category, 3);
 
   return (
-    <article>
-      <Section className="border-b border-border pb-8">
-        <Container className="max-w-3xl">
-          <Text size="sm" muted>
-            {post.publishedAt
-              ? new Date(post.publishedAt).toLocaleDateString()
-              : null}
-            {post.category ? ` · ${post.category}` : ""}
-          </Text>
-          <Heading level={1} className="mt-4">
-            {post.title}
-          </Heading>
-        </Container>
-      </Section>
-
-      {coverUrl ? (
-        <div className="border-b border-border bg-surface py-8">
-          <Container>
-            <div className="relative aspect-[16/9] overflow-hidden rounded-xl border border-border">
-              <Image
-                src={coverUrl}
-                alt={post.coverImage?.alt ?? ""}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 896px"
-                priority
-              />
-            </div>
-          </Container>
-        </div>
-      ) : null}
-
-      <Section>
-        <Container className="max-w-3xl">
-          <RichText value={post.content ?? []} />
-        </Container>
-      </Section>
-    </article>
+    <div className="relative min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary">
+      <GrainOverlay />
+      <ArticleReadingProgress />
+      <main className="pt-32 pb-32 md:pt-40">
+        <ArticleDetail post={post} relatedPosts={relatedPosts} />
+      </main>
+    </div>
   );
 }

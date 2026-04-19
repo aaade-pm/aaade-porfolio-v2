@@ -1,58 +1,30 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 
-import { Container } from "@/components/ui/container";
-import { Heading } from "@/components/ui/heading";
-import { Section } from "@/components/ui/section";
-import { Text } from "@/components/ui/text";
+import { JournalBlogListing } from "@/components/blog/journal-blog-listing";
+import { JournalHero } from "@/components/blog/journal-hero";
+import { GrainOverlay } from "@/components/sections/grain-overlay";
 import { getPosts } from "@/lib/sanity";
+import { isSanityConfigured } from "@/sanity/config/client";
+
+export const metadata: Metadata = {
+  title: "Journal",
+  description:
+    "Articles and notes — frontend, creative systems, and technology.",
+};
 
 export default async function BlogIndexPage() {
   const posts = await getPosts();
+  const sanityConfigured = isSanityConfigured();
 
   return (
-    <Section>
-      <Container>
-        <Heading level={1}>Blog</Heading>
-        <Text muted className="mt-2">
-          Articles and notes from the studio.
-        </Text>
-
-        {!posts.length ? (
-          <Text muted className="mt-10">
-            No posts yet. Add content in Sanity Studio or configure{" "}
-            <code className="rounded bg-surface-elevated px-1.5 py-0.5 text-sm text-foreground">
-              .env.local
-            </code>
-            .
-          </Text>
-        ) : (
-          <ul className="mt-10 space-y-6">
-            {posts.map((post) => (
-              <li
-                key={post._id}
-                className="border-b border-border pb-6 last:border-0"
-              >
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="group block no-underline"
-                >
-                  <span className="text-lg font-medium text-foreground group-hover:text-olive-400">
-                    {post.title}
-                  </span>
-                  <div className="mt-1 flex flex-wrap gap-3 text-sm text-muted">
-                    {post.publishedAt ? (
-                      <time dateTime={post.publishedAt}>
-                        {new Date(post.publishedAt).toLocaleDateString()}
-                      </time>
-                    ) : null}
-                    {post.category ? <span>{post.category}</span> : null}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Container>
-    </Section>
+    <div className="relative min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary">
+      <GrainOverlay />
+      <div className="px-6 pt-40 pb-32 md:px-12">
+        <div className="mx-auto w-full max-w-7xl">
+          <JournalHero />
+          <JournalBlogListing posts={posts} sanityConfigured={sanityConfigured} />
+        </div>
+      </div>
+    </div>
   );
 }
