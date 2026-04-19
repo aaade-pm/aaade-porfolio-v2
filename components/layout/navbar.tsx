@@ -1,34 +1,46 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
+import type { SiteSettingsResolved } from "@/types/site-settings";
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/projects", label: "Projects" },
-  { href: "/blog", label: "Blog" },
-  { href: "/gallery", label: "Gallery" },
-] as const;
+type Props = {
+  settings: SiteSettingsResolved;
+};
 
-export function Navbar() {
+export function Navbar({ settings }: Props) {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-background/85 backdrop-blur-md">
+      <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 md:h-16 md:px-12">
         <Link
           href="/"
-          className="text-sm font-semibold tracking-tight text-foreground no-underline hover:text-olive-400"
+          className="nav-underline font-display flex items-center gap-2 text-sm font-semibold tracking-tight text-white"
         >
-          Portfolio
+          {settings.logoUrl ? (
+            <Image
+              src={settings.logoUrl}
+              alt={settings.logo?.alt ?? settings.brandMark}
+              width={36}
+              height={36}
+              className="size-9 rounded-sm object-contain"
+            />
+          ) : null}
+          <span>{settings.brandMark}</span>
         </Link>
-        <ul className="flex items-center gap-6">
-          {links.map(({ href, label }) => (
-            <li key={href}>
+        <ul className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 md:gap-x-8">
+          {settings.navItems.map((item) => (
+            <li key={`${item.href}-${item.label}`}>
               <Link
-                href={href}
+                href={item.href}
+                target={item.openInNewTab ? "_blank" : undefined}
+                rel={item.openInNewTab ? "noopener noreferrer" : undefined}
                 className={cn(
-                  "text-sm text-muted no-underline transition-colors hover:text-foreground",
+                  "nav-underline text-[11px] font-medium tracking-widest text-zinc-500 uppercase md:text-xs",
                 )}
               >
-                {label}
+                {item.label}
               </Link>
             </li>
           ))}
