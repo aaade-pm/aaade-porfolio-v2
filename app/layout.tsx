@@ -15,10 +15,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Portfolio",
-    template: "%s · Portfolio",
+    default: "Olatunji Ademola | Frontend Engineer",
+    template: "%s · Olatunji Ademola",
   },
-  description: "Personal portfolio, blog, and project case studies",
+  description:
+    "Frontend engineer building fast, accessible interfaces — portfolio, writing, and gallery.",
 };
 
 export default function RootLayout({
@@ -29,9 +30,21 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full font-sans`}
     >
-      <body className="flex min-h-full flex-col font-sans">{children}</body>
+      <head>
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,400&f[]=satoshi@500,400,300&display=swap"
+        />
+      </head>
+      <body
+        className="flex min-h-full flex-col antialiased"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }
