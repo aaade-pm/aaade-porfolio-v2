@@ -5,17 +5,15 @@ import { HomeArchive } from "@/components/sections/home-archive";
 import { HomeHero } from "@/components/sections/home-hero";
 import { LifeGallerySection } from "@/components/sections/life-gallery-section";
 import {
-  getArchivedProjects,
   getFeaturedProjects,
   getLifeGalleryPreview,
   getSiteSettings,
 } from "@/lib/sanity";
 
 export default async function HomePage() {
-  const [settings, featured, archived, lifeGallery] = await Promise.all([
+  const [settings, featured, lifeGallery] = await Promise.all([
     getSiteSettings(),
     getFeaturedProjects(),
-    getArchivedProjects(),
     getLifeGalleryPreview(),
   ]);
 
@@ -34,15 +32,7 @@ export default async function HomePage() {
           liveLabel={settings.workLiveLabel}
           caseStudyLabel={settings.workCaseStudyLabel}
         />
-        <HomeArchive
-          archived={archived}
-          ctaLabel={settings.archiveCtaLabel}
-          modalEyebrow={settings.archiveModalEyebrow}
-          modalTitle={settings.archiveModalTitle}
-          modalDescription={settings.archiveModalDescription}
-          gridEmptyMessage={settings.archiveGridEmptyMessage}
-          caseStudyLinkLabel={settings.archiveCaseStudyLinkLabel}
-        />
+        <HomeArchive ctaLabel={settings.archiveCtaLabel} />
       </section>
       <LifeGallerySection
         items={lifeGallery}

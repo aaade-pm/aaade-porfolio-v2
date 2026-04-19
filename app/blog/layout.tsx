@@ -1,11 +1,18 @@
 import { SiteShell } from "@/components/layout/site-shell";
-import { getSiteSettings } from "@/lib/sanity";
+import { getArchivedProjects, getSiteSettings } from "@/lib/sanity";
 
 export default async function BlogLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const settings = await getSiteSettings();
-  return <SiteShell settings={settings}>{children}</SiteShell>;
+  const [settings, archived] = await Promise.all([
+    getSiteSettings(),
+    getArchivedProjects(),
+  ]);
+  return (
+    <SiteShell settings={settings} archived={archived}>
+      {children}
+    </SiteShell>
+  );
 }

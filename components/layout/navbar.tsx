@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useArchiveModal } from "@/components/layout/archive-modal-provider";
 import { cn } from "@/lib/utils";
 import type { SiteSettingsResolved } from "@/types/site-settings";
 
@@ -18,8 +19,16 @@ function navLinkActive(pathname: string, href: string) {
   return false;
 }
 
+/** Default CMS “Work” points at `/work`; treat that as the Selected Works / archive entry. */
+function isWorkNavHref(href: string) {
+  const path = href.split("#")[0].split("?")[0];
+  return path === "/work";
+}
+
 export function Navbar({ settings }: Props) {
   const pathname = usePathname();
+  const { openArchive } = useArchiveModal();
+  const isHome = pathname === "/";
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-background/85 backdrop-blur-md">
@@ -42,16 +51,48 @@ export function Navbar({ settings }: Props) {
         <ul className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 md:gap-x-8">
           {settings.navItems.map((item) => {
             const active = navLinkActive(pathname, item.href);
+            const isWork = isWorkNavHref(item.href) && !item.openInNewTab;
+            const linkClass = cn(
+              "nav-underline text-[11px] font-medium tracking-widest uppercase md:text-xs",
+              active ? "text-primary" : "text-zinc-500",
+            );
+
+            if (isWork && isHome) {
+              return (
+                <li key={`${item.href}-${item.label}`}>
+                  <Link
+                    href="/#work"
+                    className={linkClass}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            }
+
+            if (isWork && !isHome) {
+              return (
+                <li key={`${item.href}-${item.label}`}>
+                  <button
+                    type="button"
+                    onClick={openArchive}
+                    className={cn(linkClass, "cursor-pointer bg-transparent")}
+                    aria-label={`${item.label} — open project archive`}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              );
+            }
+
             return (
               <li key={`${item.href}-${item.label}`}>
                 <Link
                   href={item.href}
                   target={item.openInNewTab ? "_blank" : undefined}
                   rel={item.openInNewTab ? "noopener noreferrer" : undefined}
-                  className={cn(
-                    "nav-underline text-[11px] font-medium tracking-widest uppercase md:text-xs",
-                    active ? "text-primary" : "text-zinc-500",
-                  )}
+                  className={linkClass}
                   aria-current={active ? "page" : undefined}
                 >
                   {item.label}
