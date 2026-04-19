@@ -4,6 +4,8 @@
 
 **Always follow** `.cursor/rules/git-flow.mdc` for branches, commits, and pushes (feature branch → push `feat/…` only; never push `staging`/`main` unless the user explicitly requests it).
 
+**When it’s time to push:** ask the agent to use the **`git-flow-ship`** skill (project skill at `.cursor/skills/git-flow-ship/SKILL.md`), e.g. *“Run git-flow-ship”* or *“Use the ship skill and push.”* That workflow re-reads `git-flow.mdc` and runs build → rebase → `feat/*` push only.
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
