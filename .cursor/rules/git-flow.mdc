@@ -1,0 +1,24 @@
+---
+description: Git workflow — staging integration branch, rebase before push, user owns PRs/merges
+alwaysApply: true
+---
+
+# Git flow
+
+- **`main`:** stable / release. **`staging`:** integration branch — same tip as `main` when bootstrapping; ongoing work targets **`staging`**, not `main`.
+- **Agent:** Run **`npm run build`** before pushing. **`git fetch origin`**, create a **feature branch from `staging`**, commit, **`git rebase origin/staging`** on that branch, then **`git push -u origin <branch>`**. Do **not** merge to `staging` or `main`, open PRs, or delete remotes unless the user asks.
+- **User:** Opens PRs (e.g. feature → `staging`, then `staging` → `main`), reviews, and merges.
+
+Typical sequence:
+
+```bash
+git fetch origin
+git checkout staging && git pull origin staging
+git checkout -b feat/short-description
+# …edit, commit…
+npm run build
+git fetch origin && git rebase origin/staging
+git push -u origin feat/short-description
+```
+
+Optional: set the GitHub **default branch** to `staging` so new PRs base on it automatically.
