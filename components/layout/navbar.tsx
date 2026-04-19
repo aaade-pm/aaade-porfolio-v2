@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { useArchiveModal } from "@/components/layout/archive-modal-provider";
 import { cn } from "@/lib/utils";
@@ -38,8 +38,18 @@ function isReachMeNavHref(href: string) {
 
 export function Navbar({ settings }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
   const { openArchive } = useArchiveModal();
   const isHome = pathname === "/";
+
+  /** Scroll to an in-page id without leaving `#fragment` in the URL bar. */
+  function goToSection(elementId: string) {
+    document.getElementById(elementId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    router.replace(pathname, { scroll: false });
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-background/85 backdrop-blur-md">
@@ -73,13 +83,13 @@ export function Navbar({ settings }: Props) {
             if (isWork && isHome) {
               return (
                 <li key={`${item.href}-${item.label}`}>
-                  <Link
-                    href="/#work"
-                    className={linkClass}
-                    aria-current={active ? "page" : undefined}
+                  <button
+                    type="button"
+                    onClick={() => goToSection("work")}
+                    className={cn(linkClass, "cursor-pointer bg-transparent")}
                   >
                     {item.label}
-                  </Link>
+                  </button>
                 </li>
               );
             }
@@ -102,13 +112,14 @@ export function Navbar({ settings }: Props) {
             if (isAbout) {
               return (
                 <li key={`${item.href}-${item.label}`}>
-                  <Link
-                    href="#about"
-                    className={linkClass}
+                  <button
+                    type="button"
+                    onClick={() => goToSection("about")}
+                    className={cn(linkClass, "cursor-pointer bg-transparent")}
                     aria-current={active ? "page" : undefined}
                   >
                     {item.label}
-                  </Link>
+                  </button>
                 </li>
               );
             }
@@ -116,13 +127,14 @@ export function Navbar({ settings }: Props) {
             if (isReachMe) {
               return (
                 <li key={`${item.href}-${item.label}`}>
-                  <Link
-                    href="#contact"
-                    className={linkClass}
+                  <button
+                    type="button"
+                    onClick={() => goToSection("contact")}
+                    className={cn(linkClass, "cursor-pointer bg-transparent")}
                     aria-current={active ? "page" : undefined}
                   >
                     {item.label}
-                  </Link>
+                  </button>
                 </li>
               );
             }
