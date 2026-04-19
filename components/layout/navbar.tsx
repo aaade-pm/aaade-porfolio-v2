@@ -19,10 +19,21 @@ function navLinkActive(pathname: string, href: string) {
   return false;
 }
 
+function stripNavPath(href: string) {
+  return href.split("#")[0].split("?")[0];
+}
+
 /** Default CMS “Work” points at `/work`; treat that as the Selected Works / archive entry. */
 function isWorkNavHref(href: string) {
-  const path = href.split("#")[0].split("?")[0];
-  return path === "/work";
+  return stripNavPath(href) === "/work";
+}
+
+function isAboutNavHref(href: string) {
+  return stripNavPath(href) === "/about";
+}
+
+function isReachMeNavHref(href: string) {
+  return stripNavPath(href) === "/reach-me";
 }
 
 export function Navbar({ settings }: Props) {
@@ -52,6 +63,8 @@ export function Navbar({ settings }: Props) {
           {settings.navItems.map((item) => {
             const active = navLinkActive(pathname, item.href);
             const isWork = isWorkNavHref(item.href) && !item.openInNewTab;
+            const isAbout = isAboutNavHref(item.href) && !item.openInNewTab;
+            const isReachMe = isReachMeNavHref(item.href) && !item.openInNewTab;
             const linkClass = cn(
               "nav-underline text-[11px] font-medium tracking-widest uppercase md:text-xs",
               active ? "text-primary" : "text-zinc-500",
@@ -82,6 +95,34 @@ export function Navbar({ settings }: Props) {
                   >
                     {item.label}
                   </button>
+                </li>
+              );
+            }
+
+            if (isAbout) {
+              return (
+                <li key={`${item.href}-${item.label}`}>
+                  <Link
+                    href="#about"
+                    className={linkClass}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            }
+
+            if (isReachMe) {
+              return (
+                <li key={`${item.href}-${item.label}`}>
+                  <Link
+                    href="#contact"
+                    className={linkClass}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               );
             }

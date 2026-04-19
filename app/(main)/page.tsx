@@ -1,4 +1,3 @@
-import { AboutSection } from "@/components/sections/about-section";
 import { FeaturedWorkSection } from "@/components/sections/featured-work-section";
 import { GrainOverlay } from "@/components/sections/grain-overlay";
 import { HomeArchive } from "@/components/sections/home-archive";
@@ -41,7 +40,6 @@ export default async function HomePage() {
         emptyMessage={settings.lifeEmptyMessage}
         galleryCtaLabel={settings.lifeGalleryCtaLabel}
       />
-      <AboutSection settings={settings} />
     </div>
   );
 }

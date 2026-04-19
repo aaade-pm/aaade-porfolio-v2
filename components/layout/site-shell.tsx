@@ -1,6 +1,7 @@
 import { ArchiveModalProvider } from "@/components/layout/archive-modal-provider";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
+import { AboutSection } from "@/components/sections/about-section";
 import type { SiteSettingsResolved } from "@/types/site-settings";
 import type { ProjectListItem } from "@/types/sanity";
 
@@ -22,6 +23,7 @@ export function SiteShell({ settings, archived, children }: Props) {
     >
       <Navbar settings={settings} />
       <main className="flex flex-1 flex-col">{children}</main>
+      <AboutSection settings={settings} />
       <Footer settings={settings} />
     </ArchiveModalProvider>
   );
