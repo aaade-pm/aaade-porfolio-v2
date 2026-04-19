@@ -24,7 +24,7 @@ function blockToPlainText(block: unknown): string {
     return parts.join("\n");
   }
 
-  const ptBlock = block as PortableTextBlock;
+  const ptBlock = block as unknown as PortableTextBlock;
   const children = ptBlock.children;
   if (!Array.isArray(children)) return "";
   return children
