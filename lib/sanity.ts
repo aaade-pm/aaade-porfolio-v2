@@ -262,10 +262,12 @@ export async function getFeaturedProjects(): Promise<ProjectListItem[]> {
   return getClient().fetch(featuredProjectsQuery, {}, fetchOptions);
 }
 
-export async function getArchivedProjects(): Promise<ProjectListItem[]> {
-  if (!isSanityConfigured()) return [];
-  return getClient().fetch(archivedProjectsQuery, {}, fetchOptions);
-}
+export const getArchivedProjects = cache(
+  async (): Promise<ProjectListItem[]> => {
+    if (!isSanityConfigured()) return [];
+    return getClient().fetch(archivedProjectsQuery, {}, fetchOptions);
+  },
+);
 
 export async function getProjectBySlug(
   slug: string,

@@ -3,11 +3,7 @@ import type { Metadata } from "next";
 import { FeaturedWorkSection } from "@/components/sections/featured-work-section";
 import { GrainOverlay } from "@/components/sections/grain-overlay";
 import { HomeArchive } from "@/components/sections/home-archive";
-import {
-  getArchivedProjects,
-  getFeaturedProjects,
-  getSiteSettings,
-} from "@/lib/sanity";
+import { getFeaturedProjects, getSiteSettings } from "@/lib/sanity";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -15,10 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default async function WorkPage() {
-  const [settings, featured, archived] = await Promise.all([
+  const [settings, featured] = await Promise.all([
     getSiteSettings(),
     getFeaturedProjects(),
-    getArchivedProjects(),
   ]);
 
   return (
@@ -35,15 +30,7 @@ export default async function WorkPage() {
           liveLabel={settings.workLiveLabel}
           caseStudyLabel={settings.workCaseStudyLabel}
         />
-        <HomeArchive
-          archived={archived}
-          ctaLabel={settings.archiveCtaLabel}
-          modalEyebrow={settings.archiveModalEyebrow}
-          modalTitle={settings.archiveModalTitle}
-          modalDescription={settings.archiveModalDescription}
-          gridEmptyMessage={settings.archiveGridEmptyMessage}
-          caseStudyLinkLabel={settings.archiveCaseStudyLinkLabel}
-        />
+        <HomeArchive ctaLabel={settings.archiveCtaLabel} />
       </section>
     </div>
   );
