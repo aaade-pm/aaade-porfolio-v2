@@ -30,6 +30,8 @@ export type ProjectListItem = {
   images: SanityImage[] | null;
   githubUrl: string | null;
   liveUrl: string | null;
+  category: string | null;
+  year: number | null;
 };
 
 export type ProjectDetail = ProjectListItem & {

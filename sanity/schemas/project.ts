@@ -21,6 +21,29 @@ export const projectType = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "category",
+      title: "Category label",
+      description: 'e.g. "FINTECH" — shown as "01 / FINTECH" on featured rows',
+      type: "string",
+    }),
+    defineField({
+      name: "year",
+      title: "Year",
+      type: "number",
+    }),
+    defineField({
+      name: "featured",
+      title: "Featured on homepage",
+      type: "boolean",
+      initialValue: false,
+    }),
+    defineField({
+      name: "archived",
+      title: "Show in archive modal",
+      type: "boolean",
+      initialValue: false,
+    }),
+    defineField({
       name: "description",
       title: "Description",
       type: "text",
