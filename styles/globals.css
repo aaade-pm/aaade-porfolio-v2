@@ -141,6 +141,15 @@
 }
 
 @layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .shadow-cta {
     box-shadow: 0 0 30px color-mix(in srgb, var(--primary) 30%, transparent);
   }

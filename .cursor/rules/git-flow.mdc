@@ -1,15 +1,35 @@
 ---
-description: Git workflow — staging integration branch, rebase before push, user owns PRs/merges
+description: Git workflow — ALWAYS use feature branches; never push staging/main unless user explicitly orders it
 alwaysApply: true
 ---
 
-# Git flow
+# Git flow (mandatory)
 
-- **`main`:** stable / release. **`staging`:** integration branch — same tip as `main` when bootstrapping; ongoing work targets **`staging`**, not `main`.
-- **Agent:** Run **`npm run build`** before pushing. **`git fetch origin`**, create a **feature branch from `staging`**, commit, **`git rebase origin/staging`** on that branch, then **`git push -u origin <branch>`**. Do **not** merge to `staging` or `main`, open PRs, or delete remotes unless the user asks.
-- **User:** Opens PRs (e.g. feature → `staging`, then `staging` → `main`), reviews, and merges.
+**The agent MUST follow this workflow for any git push.** Do not skip because a task is “small” or “just a chore.”
 
-Typical sequence:
+- **`main`:** stable / release only.
+- **`staging`:** integration; work lands here **only via the user’s PR merge**, not via the agent pushing to `staging`.
+
+## Agent (required)
+
+1. Run **`npm run build`** before any push.
+2. **`git fetch origin`** (and `git checkout staging && git pull origin staging` if needed).
+3. **`git checkout -b feat/<short-description>`** from up-to-date **`staging`** (never commit directly on `staging` / `main` for delivery).
+4. Commit on the feature branch.
+5. **`git fetch origin && git rebase origin/staging`** on that feature branch.
+6. **`git push -u origin feat/<short-description>`** only.
+
+**NEVER:**
+
+- **`git push origin staging`** or **`git push origin main`** unless the user **explicitly** asks you to push that branch by name.
+- Merge, squash-merge, or open/close PRs unless the user **explicitly** asks.
+- Delete remotes or force-push unless the user **explicitly** asks.
+
+## User
+
+Opens PRs (**`feat/…` → `staging`**, then **`staging` → `main`**), reviews, and merges.
+
+## Typical sequence
 
 ```bash
 git fetch origin
@@ -21,4 +41,4 @@ git fetch origin && git rebase origin/staging
 git push -u origin feat/short-description
 ```
 
-Optional: set the GitHub **default branch** to `staging` so new PRs base on it automatically.
+Optional: set the GitHub **default branch** to **`staging`** so new PRs base on it automatically.

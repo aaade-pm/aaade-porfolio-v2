@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building High-Performance Animation Systems | Olatunji Ademola</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,400&f[]=satoshi@500,400,300&display=swap');
+
+        :root {
+            --olive: #708238;
+            --olive-light: #8ea64b;
+            --charcoal: #080808;
+            --off-white: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Satoshi', sans-serif;
+            background-color: var(--charcoal);
+            color: var(--off-white);
+            cursor: crosshair;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Cabinet Grotesk', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .text-olive { color: var(--olive); }
+        .bg-olive { background-color: var(--olive); }
+
+        .grain {
+            position: fixed;
+            top: 0; left: 0;
+            height: 100%; width: 100%;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        .article-content p {
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-size: 1.125rem;
+            color: #d0d0d0;
+        }
+
+        .article-content h2 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-top: 4rem;
+            margin-bottom: 1.5rem;
+            color: var(--off-white);
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid var(--olive);
+            padding-left: 2rem;
+            font-style: italic;
+            margin: 3rem 0;
+            font-size: 1.5rem;
+            color: var(--off-white);
+        }
+
+        .code-block {
+            background: #111;
+            border: 1px solid #222;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 2.5rem 0;
+        }
+
+        .reading-progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: var(--olive);
+            z-index: 100;
+            width: 0%;
+            transition: width 0.1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .article-content h2 { font-size: 1.75rem; }
+            .article-content p { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="reading-progress" id="progress-bar"></div>
+    <div class="relative min-h-screen selection:bg-[#708238]/30 selection:text-[#708238]">
+        <div class="grain"></div>
+
+        <!-- Persistent Navigation -->
+        <sd-component componentId="6e994758-f732-4c4f-a4ad-2b99ca7515b5" name="Navigation" props='{"activeItem":""}'></sd-component>
+
+        <main class="pt-32 pb-32">
+            <!-- Article Header -->
+            <header class="px-6 md:px-12 max-w-7xl mx-auto mb-20">
+                <div class="flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.3em] text-zinc-500 mb-8 animate-fade-up">
+                    <span>Oct 24, 2023</span>
+                    <span class="w-1 h-1 rounded-full bg-olive"></span>
+                    <span>8 Min Read</span>
+                    <span class="w-1 h-1 rounded-full bg-olive"></span>
+                    <span class="text-olive">Engineering</span>
+                </div>
+                
+                <h1 class="text-4xl md:text-7xl lg:text-8xl font-display font-bold leading-[0.9] tracking-tighter mb-12 animate-fade-up" style="animation-delay: 100ms">
+                    Building <span class="text-olive italic">High-Performance</span> Animation Systems.
+                </h1>
+
+                <div class="flex items-center gap-4 animate-fade-up" style="animation-delay: 200ms">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Olatunji" alt="Ademola Olatunji" class="w-12 h-12 rounded-full border border-zinc-800">
+                    <div>
+                        <p class="text-sm font-medium">Ademola Olatunji</p>
+                        <p class="text-xs text-zinc-500 uppercase tracking-widest">Lead Frontend @ AAADE</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Featured Image -->
+            <div class="w-full px-6 md:px-12 max-w-7xl mx-auto mb-20 animate-fade-up" style="animation-delay: 300ms">
+                <div class="aspect-video md:aspect-[21/9] overflow-hidden rounded-3xl relative group">
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=2000" alt="Modern Workspace" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 grayscale hover:grayscale-0">
+                    <div class="absolute inset-0 bg-olive/10 mix-blend-overlay"></div>
+                </div>
+                <p class="mt-4 text-xs text-center text-zinc-600 uppercase tracking-widest italic">Analog tools meeting digital precision.</p>
+            </div>
+
+            <!-- Article Body -->
+            <article class="px-6 md:px-12 max-w-3xl mx-auto article-content">
+                <p class="text-xl md:text-2xl text-white font-light mb-12">
+                    In the modern web landscape, animations are no longer a luxury. They are functional anchors that guide user intent and provide essential feedback. But how do we build them without sacrificing core performance?
+                </p>
+
+                <p>
+                    We've all seen it: a beautiful landing page that stutters as soon as you scroll, or a mobile menu that feels like it's dragging through mud. Often, the culprit isn't the animation itself, but the execution layer. When I build systems, I prioritize the 60FPS gold standard, ensuring that every frame is accounted for.
+                </p>
+
+                <h2>The Foundation: GPU Acceleration</h2>
+                <p>
+                    The first rule of high-performance web animation is knowing what properties to animate. While it's tempting to animate <code>height</code>, <code>top</code>, or <code>margin</code>, these trigger browser re-paints and re-layouts that kill performance. Instead, we should stick to the "holy grail" properties: <code>transform</code> and <code>opacity</code>.
+                </p>
+
+                <div class="code-block">
+<pre class="text-zinc-400"><span class="text-olive">// THE RIGHT WAY</span>
+<span class="text-white">framerMotion</span>.animate("#element", { 
+  x: 100, 
+  opacity: 1 
+}, { duration: 0.8 });
+
+<span class="text-olive">// THE WRONG WAY (Triggers layout)</span>
+<span class="text-white">framerMotion</span>.animate("#element", { 
+  left: "100px", 
+  width: "200px" 
+});</pre>
+                </div>
+
+                <blockquote>
+                    "Animation is not about making things move; it's about making things alive in a way that feels natural to the human eye."
+                </blockquote>
+
+                <h2>Orchestrating Complex Flows</h2>
+                <p>
+                    As systems grow, simple transitions aren't enough. We need orchestration. This is where GSAP (GreenSock Animation Platform) shines. Its ability to create complex timelines with zero overhead makes it my go-to for data-heavy visualizations.
+                </p>
+
+                <p>
+                    In my recent project, <em>FlowOS</em>, we needed to animate thousands of micro-elements simultaneously. By leveraging GSAP's <code>stagger</code> functionality and hardware-accelerated layers, we maintained a consistent frame rate even on lower-end devices.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-12">
+                    <div class="bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
+                        <h4 class="text-olive text-xs uppercase tracking-widest font-bold mb-4">Constraint 01</h4>
+                        <p class="text-sm mb-0">Always aim for less than 16ms per frame to avoid jank.</p>
+                    </div>
+                    <div class="bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
+                        <h4 class="text-olive text-xs uppercase tracking-widest font-bold mb-4">Constraint 02</h4>
+                        <p class="text-sm mb-0">Batch your animations to prevent multiple reflow cycles.</p>
+                    </div>
+                </div>
+
+                <h2>Conclusion</h2>
+                <p>
+                    Performance isn't just a technical metric; it's a design requirement. By understanding how browsers render content, we can build expressive, personality-driven interfaces that don't compromise on speed. Stay curious, build fast.
+                </p>
+            </article>
+
+            <!-- Tags -->
+            <div class="px-6 md:px-12 max-w-3xl mx-auto flex flex-wrap gap-2 mt-12 mb-32">
+                <span class="px-4 py-2 bg-zinc-900 rounded-full text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer">#GSAP</span>
+                <span class="px-4 py-2 bg-zinc-900 rounded-full text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer">#Performance</span>
+                <span class="px-4 py-2 bg-zinc-900 rounded-full text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer">#Frontend</span>
+                <span class="px-4 py-2 bg-zinc-900 rounded-full text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer">#Animations</span>
+            </div>
+
+            <!-- Newsletter CTA -->
+            <section class="px-6 md:px-12 max-w-7xl mx-auto mb-40">
+                <div class="bg-olive rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+                    <h2 class="text-4xl md:text-6xl font-display font-bold text-white mb-6 relative z-10 tracking-tight">
+                        Get the latest experiments<br>in your inbox.
+                    </h2>
+                    <p class="text-white/80 max-w-md mx-auto mb-10 text-lg">
+                        Join 2,000+ engineers reading about creative coding, system design, and the analog life.
+                    </p>
+                    <form class="max-w-md mx-auto flex flex-col md:flex-row gap-4 relative z-10">
+                        <input type="email" placeholder="your@email.com" class="flex-1 bg-white/10 border border-white/20 rounded-full px-6 py-4 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 backdrop-blur-sm">
+                        <button type="submit" class="bg-white text-olive font-display font-bold px-8 py-4 rounded-full hover:scale-105 transition-transform shadow-xl">
+                            Subscribe
+                        </button>
+                    </form>
+                    <p class="mt-6 text-white/40 text-xs uppercase tracking-widest">Zero spam. Just high-fidelity content.</p>
+                </div>
+            </section>
+
+            <!-- Related Articles -->
+            <section class="px-6 md:px-12 max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-12">
+                    <h3 class="text-2xl font-display font-bold">Keep Reading</h3>
+                    <a href="https://draft-53843f77-c039-4398-b337-16b58a955100.preview.superdesign.dev" id="all-articles-link" class="text-xs uppercase tracking-widest font-bold text-olive hover:text-olive-light transition-colors">
+                        View All Articles
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Related 1 -->
+                    <a href="#" id="related-link-1" class="group flex flex-col">
+                        <div class="aspect-video rounded-2xl overflow-hidden mb-6">
+                            <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&q=80&w=800" alt="Related" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        </div>
+                        <div class="flex items-center gap-3 text-[10px] uppercase tracking-widest text-zinc-500 mb-2">
+                            <span class="text-olive">Thoughts</span>
+                            <span>•</span>
+                            <span>5 Min Read</span>
+                        </div>
+                        <h4 class="text-xl font-display font-bold group-hover:text-olive transition-colors">Why I Still Believe in Clean CSS-First UI.</h4>
+                    </a>
+
+                    <!-- Related 2 -->
+                    <a href="#" id="related-link-2" class="group flex flex-col">
+                        <div class="aspect-video rounded-2xl overflow-hidden mb-6">
+                            <img src="https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&q=80&w=800" alt="Related" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        </div>
+                        <div class="flex items-center gap-3 text-[10px] uppercase tracking-widest text-zinc-500 mb-2">
+                            <span class="text-olive">Experiments</span>
+                            <span>•</span>
+                            <span>12 Min Read</span>
+                        </div>
+                        <h4 class="text-xl font-display font-bold group-hover:text-olive transition-colors">Generative Art with Three.js Shaders.</h4>
+                    </a>
+
+                    <!-- Related 3 -->
+                    <a href="#" id="related-link-3" class="group flex flex-col hidden lg:flex">
+                        <div class="aspect-video rounded-2xl overflow-hidden mb-6">
+                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800" alt="Related" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        </div>
+                        <div class="flex items-center gap-3 text-[10px] uppercase tracking-widest text-zinc-500 mb-2">
+                            <span class="text-olive">Career</span>
+                            <span>•</span>
+                            <span>6 Min Read</span>
+                        </div>
+                        <h4 class="text-xl font-display font-bold group-hover:text-olive transition-colors">The Designer-Developer Hybrid Gap.</h4>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Component -->
+        <sd-component componentId="d18b84c1-0203-4719-ae0b-e061a2cb2e5a" name="Footer"></sd-component>
+    </div>
+
+    <script>
+        // Reading Progress Logic
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        });
+
+        // Entrance Animations on scroll
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-up');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            el.style.opacity = '0';
+            observer.observe(el);
+        });
+
+        // Apply manual observer to elements without classes if needed
+        document.querySelectorAll('.article-content h2, .article-content blockquote, section').forEach(el => {
+            el.classList.add('opacity-0');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
