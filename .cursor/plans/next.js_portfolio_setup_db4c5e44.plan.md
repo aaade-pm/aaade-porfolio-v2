@@ -4,19 +4,19 @@ overview: Greenfield setup of a Next.js 15+ App Router portfolio with TypeScript
 todos:
   - id: init-next
     content: Run create-next-app (TS, App Router, Tailwind, ESLint, no src/), Prettier + eslint-config-prettier, fix @/* paths to project root
-    status: in_progress
+    status: completed
   - id: folders-design
     content: Add app route groups, styles/globals.css, Tailwind theme (olive + dark), globals typography/container
-    status: pending
+    status: completed
   - id: components-motion
     content: Implement Container, Section, Button, Heading, Text, Navbar, Footer + lib/motion variants and client wrappers
-    status: pending
+    status: completed
   - id: sanity-schemas
     content: Add sanity.config, sanity/schemas (blog, project, gallery), optional /studio route
-    status: pending
+    status: completed
   - id: sanity-fetch-pages
     content: lib/sanity.ts + getPosts/getPostBySlug/getProjects/getProjectBySlug/getGalleryImages; wire minimal blog/projects/home pages
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -66,9 +66,9 @@ Optional but **production-friendly**: add `[app/studio/[[...tool]]/page.tsx](app
 
 Implement small, composable pieces under `[components/ui/](components/ui/)` and `[components/layout/](components/layout/)`:
 
-- `**Container`**: max-width + horizontal padding, optional `as` polymorphism if useful.
-- `**Section`**: vertical spacing wrapper (padding/margin scale).
-- `**Button**`: `variant` prop (`primary`, `secondary`, `ghost`, etc.) using `class-variance-authority` (CVA) or a minimal manual variant map — consistent with Tailwind only.
+- `**Container`: max-width + horizontal padding, optional `as` polymorphism if useful.
+- `**Section`: vertical spacing wrapper (padding/margin scale).
+- `**Button`**: `variant` prop (`primary`, `secondary`, `ghost`, etc.) using `class-variance-authority` (CVA) or a minimal manual variant map — consistent with Tailwind only.
 - `**Heading**`, `**Text**`: semantic tags + size/weight/color props mapped to classes.
 - `**Navbar**`, `**Footer**`: minimal links to `/`, `/blog`, `/projects`; footer can hold copyright + social placeholders.
 
@@ -106,10 +106,10 @@ flowchart LR
 ## Step 7: Sanity client and fetch helpers- `[lib/sanity.ts](lib/sanity.ts)`: create **read-only** client using env vars; export `client` and `urlFor` (image builder). Use a stable `apiVersion` (e.g. `2024-01-01` or current dated string).
 
 - Add GROQ queries as constants or colocated functions:
-  - `getPosts()` — list posts ordered by `publishedAt desc`, fields needed for cards  - `getPostBySlug(slug)` — single post + full body
+  - `getPosts()` — list posts ordered by `publishedAt desc`, fields needed for cards - `getPostBySlug(slug)` — single post + full body
   - `getProjects()` / `getProjectBySlug(slug)`
   - `getGalleryImages()`
-- Use `**fetch` with caching** appropriate for production: Next.js `fetch` to Sanity’s API with `next: { revalidate: 60 }` (or tag-based revalidation later). Alternatively use `@sanity/client.fetch` with explicit revalidate via `unstable_cache` if you standardize on the client — pick one pattern and stick to it (recommended: `next-sanity`’s `createClient` + fetch options aligned with App Router).
+- Use `**fetch` with caching appropriate for production: Next.js `fetch` to Sanity’s API with `next: { revalidate: 60 }` (or tag-based revalidation later). Alternatively use `@sanity/client.fetch` with explicit revalidate via `unstable_cache` if you standardize on the client — pick one pattern and stick to it (recommended: `next-sanity`’s `createClient` + fetch options aligned with App Router).
 
 ## Step 8: Minimal pages (functional, not polished UI)
 
@@ -117,7 +117,7 @@ flowchart LR
 - **Blog list** `[app/blog/page.tsx](app/blog/page.tsx)`: `getPosts()` in server component; map to simple list with title + date + link to `/blog/[slug]`.
 - **Blog detail** `[app/blog/[slug]/page.tsx](app/blog/[slug]/page.tsx)`: `generateStaticParams` or `dynamicParams` as needed; render title, cover (next/image + `urlFor`), and `<PortableText>` for body.
 - **Projects list / detail**: same pattern with `getProjects()` / `getProjectBySlug()`.
-- Add `**generateMetadata`** on detail routes for basic SEO (title from Sanity).
+- Add `**generateMetadata` on detail routes for basic SEO (title from Sanity).
 
 ## Step 9: Clean code conventions (enforced by structure)
 
