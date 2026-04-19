@@ -6,11 +6,10 @@ export const DEFAULT_SITE_SETTINGS: SiteSettingsResolved = {
   logoUrl: null,
   navItems: [
     { label: "Work", href: "/work" },
-    { label: "Life", href: "/life" },
-    { label: "Journal", href: "/blog" },
-    { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
     { label: "Gallery", href: "/gallery" },
+    { label: "Blog", href: "/blog" },
+    { label: "About", href: "/about" },
+    { label: "Reach-me", href: "/reach-me" },
   ],
 
   heroTimezone: "Africa/Lagos",
@@ -86,11 +85,12 @@ function normalizeNavHref(href: string): string {
     "/#work": "/work",
     "/#life": "/life",
     "/#about": "/about",
-    "/#contact": "/contact",
+    "/#contact": "/reach-me",
     "#work": "/work",
     "#life": "/life",
     "#about": "/about",
-    "#contact": "/contact",
+    "#contact": "/reach-me",
+    "/contact": "/reach-me",
   };
   return legacy[href.trim()] ?? href;
 }
