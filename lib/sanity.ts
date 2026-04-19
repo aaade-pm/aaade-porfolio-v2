@@ -6,6 +6,7 @@ import {
   DEFAULT_SITE_SETTINGS,
   mergeSiteSettings,
 } from "@/lib/site-settings-defaults";
+import { estimateReadingMinutesFromPortableText } from "@/lib/reading-time";
 import {
   apiVersion,
   getSanityDataset,
@@ -13,6 +14,8 @@ import {
   isSanityConfigured,
 } from "@/sanity/config/client";
 import type { SiteSettingsResolved } from "@/types/site-settings";
+import type { PortableTextBlock } from "@portabletext/types";
+
 import type {
   GalleryItem,
   PostDetail,
@@ -44,15 +47,35 @@ const postsQuery = groq`*[_type == "post"] | order(publishedAt desc) {
   "slug": slug.current,
   publishedAt,
   category,
-  coverImage
+  excerpt,
+  coverImage,
+  content
 }`;
 
 const postBySlugQuery = groq`*[_type == "post" && slug.current == $slug][0] {
   _id,
   title,
+  titleAccent,
   "slug": slug.current,
   publishedAt,
   category,
+  excerpt,
+  coverCaption,
+  coverImage,
+  authorName,
+  authorRole,
+  authorImage,
+  tags,
+  content
+}`;
+
+const relatedPostsQuery = groq`*[_type == "post" && _id != $id] | order(publishedAt desc) [0...15] {
+  _id,
+  title,
+  "slug": slug.current,
+  publishedAt,
+  category,
+  excerpt,
   coverImage,
   content
 }`;
@@ -81,6 +104,8 @@ const archivedProjectsQuery =
 const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0] {
   _id,
   title,
+  titleAccent,
+  caseStudyEyebrow,
   "slug": slug.current,
   description,
   techStack,
@@ -89,8 +114,33 @@ const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0
   liveUrl,
   category,
   year,
+  role,
+  context,
+  timeline,
+  stackSummary,
+  challengeTitle,
+  overview,
+  problem,
+  approachSteps[] {
+    title,
+    body
+  },
+  outcomes[] {
+    value,
+    label,
+    description
+  },
+  lessons,
+  lessonsAttribution,
+  lessonsAttributionRole,
   caseStudy
 }`;
+
+const projectSlugsOrderedQuery =
+  groq`*[_type == "project"] | order(year desc, _createdAt desc) {
+    "slug": slug.current,
+    title
+  }`;
 
 const galleryQuery = groq`*[_type == "galleryItem"] | order(_createdAt desc) {
   _id,
@@ -102,14 +152,93 @@ const galleryQuery = groq`*[_type == "galleryItem"] | order(_createdAt desc) {
 const siteSettingsQuery =
   groq`*[_type == "siteSettings"] | order(_updatedAt desc)[0]`;
 
+type PostListRaw = Omit<PostListItem, "coverUrl" | "readingTimeMinutes"> & {
+  content: PortableTextBlock[] | null;
+};
+
+type PostDetailRaw = Omit<
+  PostDetail,
+  "coverUrl" | "readingTimeMinutes" | "authorImageUrl"
+> & {
+  content: PortableTextBlock[] | null;
+};
+
 export async function getPosts(): Promise<PostListItem[]> {
   if (!isSanityConfigured()) return [];
-  return getClient().fetch(postsQuery, {}, fetchOptions);
+  const raw = await getClient().fetch<PostListRaw[]>(postsQuery, {}, fetchOptions);
+  return raw.map((post) => {
+    const { content, ...rest } = post;
+    return {
+      ...rest,
+      excerpt: post.excerpt ?? null,
+      readingTimeMinutes: estimateReadingMinutesFromPortableText(content),
+      coverUrl: post.coverImage
+        ? (urlForImage(post.coverImage)?.width(800).height(600).url() ?? null)
+        : null,
+    };
+  });
 }
 
 export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
   if (!isSanityConfigured()) return null;
-  return getClient().fetch(postBySlugQuery, { slug }, fetchOptions);
+  const post = await getClient().fetch<PostDetailRaw | null>(
+    postBySlugQuery,
+    { slug },
+    fetchOptions,
+  );
+  if (!post) return null;
+  const { content, ...rest } = post;
+  return {
+    ...rest,
+    content: content as PostDetail["content"],
+    titleAccent: post.titleAccent ?? null,
+    coverCaption: post.coverCaption ?? null,
+    authorName: post.authorName ?? null,
+    authorRole: post.authorRole ?? null,
+    authorImage: post.authorImage ?? null,
+    tags: post.tags ?? null,
+    excerpt: post.excerpt ?? null,
+    readingTimeMinutes: estimateReadingMinutesFromPortableText(content),
+    coverUrl: post.coverImage
+      ? (urlForImage(post.coverImage)?.width(1600).height(900).url() ?? null)
+      : null,
+    authorImageUrl: post.authorImage
+      ? (urlForImage(post.authorImage)?.width(128).height(128).url() ?? null)
+      : null,
+  };
+}
+
+export async function getRelatedPosts(
+  excludeId: string,
+  category: string | null,
+  limit: number,
+): Promise<PostListItem[]> {
+  if (!isSanityConfigured()) return [];
+  const raw = await getClient().fetch<PostListRaw[]>(
+    relatedPostsQuery,
+    { id: excludeId },
+    fetchOptions,
+  );
+  const withMeta = raw.map((post) => {
+    const { content, ...rest } = post;
+    return {
+      ...rest,
+      excerpt: post.excerpt ?? null,
+      readingTimeMinutes: estimateReadingMinutesFromPortableText(content),
+      coverUrl: post.coverImage
+        ? (urlForImage(post.coverImage)?.width(800).height(600).url() ?? null)
+        : null,
+    };
+  });
+  const sorted = [...withMeta].sort((a, b) => {
+    const aMatch = category ? (a.category === category ? 1 : 0) : 0;
+    const bMatch = category ? (b.category === category ? 1 : 0) : 0;
+    if (aMatch !== bMatch) return bMatch - aMatch;
+    return (
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+  });
+  return sorted.slice(0, limit);
 }
 
 export async function getProjects(): Promise<ProjectListItem[]> {
@@ -131,7 +260,43 @@ export async function getProjectBySlug(
   slug: string,
 ): Promise<ProjectDetail | null> {
   if (!isSanityConfigured()) return null;
-  return getClient().fetch(projectBySlugQuery, { slug }, fetchOptions);
+  const project = await getClient().fetch<ProjectDetail | null>(
+    projectBySlugQuery,
+    { slug },
+    fetchOptions,
+  );
+  if (!project) return null;
+  return {
+    ...project,
+    titleAccent: project.titleAccent ?? null,
+    caseStudyEyebrow: project.caseStudyEyebrow ?? null,
+    role: project.role ?? null,
+    context: project.context ?? null,
+    timeline: project.timeline ?? null,
+    stackSummary: project.stackSummary ?? null,
+    challengeTitle: project.challengeTitle ?? null,
+    overview: project.overview ?? null,
+    problem: project.problem ?? null,
+    approachSteps: project.approachSteps ?? null,
+    outcomes: project.outcomes ?? null,
+    lessons: project.lessons ?? null,
+    lessonsAttribution: project.lessonsAttribution ?? null,
+    lessonsAttributionRole: project.lessonsAttributionRole ?? null,
+  };
+}
+
+export async function getNextProjectBySlug(
+  currentSlug: string,
+): Promise<{ slug: string; title: string } | null> {
+  if (!isSanityConfigured()) return null;
+  const rows = await getClient().fetch<{ slug: string; title: string }[]>(
+    projectSlugsOrderedQuery,
+    {},
+    fetchOptions,
+  );
+  const i = rows.findIndex((r) => r.slug === currentSlug);
+  if (i === -1 || i >= rows.length - 1) return null;
+  return rows[i + 1] ?? null;
 }
 
 export async function getGalleryImages(): Promise<GalleryItem[]> {
