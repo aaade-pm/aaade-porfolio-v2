@@ -79,4 +79,9 @@ export type GalleryItem = {
   _id: string;
   image: SanityImage | null;
   caption: string | null;
+  captionTitle: string | null;
+  captionDescription: string | null;
+  /** From image asset metadata for masonry aspect ratio */
+  assetWidth: number | null;
+  assetHeight: number | null;
 };

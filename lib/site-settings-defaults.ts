@@ -43,6 +43,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettingsResolved = {
     "A glimpse into life away from the screen — photography, travel, and what keeps the work human.",
   lifeEmptyMessage:
     "Gallery items will appear here from Sanity (galleryItem documents).",
+  lifeGalleryCtaLabel: "See more",
 
   aboutEyebrow: "The narrative",
   aboutBody: null,
@@ -186,6 +187,8 @@ export function mergeSiteSettings(
       (raw.lifeDescription as string) ?? defaults.lifeDescription,
     lifeEmptyMessage:
       (raw.lifeEmptyMessage as string) ?? defaults.lifeEmptyMessage,
+    lifeGalleryCtaLabel:
+      (raw.lifeGalleryCtaLabel as string) ?? defaults.lifeGalleryCtaLabel,
 
     aboutEyebrow: (raw.aboutEyebrow as string) ?? defaults.aboutEyebrow,
     aboutBody:

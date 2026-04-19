@@ -41,6 +41,8 @@ export type SiteSettingsResolved = {
   lifeTitle: string;
   lifeDescription: string;
   lifeEmptyMessage: string;
+  /** CTA below life/gallery preview (e.g. links to /gallery). */
+  lifeGalleryCtaLabel: string;
 
   aboutEyebrow: string;
   aboutBody: PortableTextBlock[] | null;
