@@ -1,9 +1,11 @@
 import { SiteShell } from "@/components/layout/site-shell";
+import { getSiteSettings } from "@/lib/sanity";
 
-export default function MainLayout({
+export default async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <SiteShell>{children}</SiteShell>;
+  const settings = await getSiteSettings();
+  return <SiteShell settings={settings}>{children}</SiteShell>;
 }

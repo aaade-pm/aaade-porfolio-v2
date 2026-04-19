@@ -1,9 +1,11 @@
 import { SiteShell } from "@/components/layout/site-shell";
+import { getSiteSettings } from "@/lib/sanity";
 
-export default function GalleryLayout({
+export default async function GalleryLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <SiteShell>{children}</SiteShell>;
+  const settings = await getSiteSettings();
+  return <SiteShell settings={settings}>{children}</SiteShell>;
 }

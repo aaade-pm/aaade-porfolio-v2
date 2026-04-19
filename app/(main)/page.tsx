@@ -1,87 +1,56 @@
-import Link from "next/link";
+import { AboutSection } from "@/components/sections/about-section";
+import { FeaturedWorkSection } from "@/components/sections/featured-work-section";
+import { GrainOverlay } from "@/components/sections/grain-overlay";
+import { HomeArchive } from "@/components/sections/home-archive";
+import { HomeHero } from "@/components/sections/home-hero";
+import { LifeGallerySection } from "@/components/sections/life-gallery-section";
+import {
+  getArchivedProjects,
+  getFeaturedProjects,
+  getGalleryImages,
+  getSiteSettings,
+} from "@/lib/sanity";
 
-import { Container } from "@/components/ui/container";
-import { FadeIn } from "@/components/ui/fade-in";
-import { Heading } from "@/components/ui/heading";
-import { Section } from "@/components/ui/section";
-import { SlideUp } from "@/components/ui/slide-up";
-import { Stagger, StaggerItem } from "@/components/ui/stagger";
-import { Text } from "@/components/ui/text";
+export default async function HomePage() {
+  const [settings, featured, archived, gallery] = await Promise.all([
+    getSiteSettings(),
+    getFeaturedProjects(),
+    getArchivedProjects(),
+    getGalleryImages(),
+  ]);
 
-export default function HomePage() {
   return (
-    <>
-      <Section size="lg" className="border-b border-border bg-surface">
-        <Container>
-          <SlideUp>
-            <Heading level={1} className="max-w-2xl">
-              Designer & developer building thoughtful digital experiences.
-            </Heading>
-            <Text size="lg" muted className="mt-6 max-w-xl">
-              Portfolio, writing, and a living gallery — olive-toned,
-              dark-first, and motion-rich.
-            </Text>
-          </SlideUp>
-        </Container>
-      </Section>
-
-      <Section>
-        <Container>
-          <FadeIn>
-            <Heading level={2}>Featured work</Heading>
-            <Text muted className="mt-2 max-w-2xl">
-              Case studies and product work will appear here from Sanity.
-            </Text>
-          </FadeIn>
-          <Stagger className="mt-10 grid gap-6 sm:grid-cols-2">
-            <StaggerItem className="rounded-xl border border-border bg-surface-elevated p-6">
-              <Heading level={3} as="h3">
-                Projects
-              </Heading>
-              <Text muted className="mt-2">
-                Explore case studies, tech stack, and links to live sites.
-              </Text>
-              <Link
-                href="/projects"
-                className="mt-4 inline-block text-sm font-medium text-olive-400 no-underline hover:text-olive-300"
-              >
-                View projects →
-              </Link>
-            </StaggerItem>
-            <StaggerItem className="rounded-xl border border-border bg-surface-elevated p-6">
-              <Heading level={3} as="h3">
-                Blog
-              </Heading>
-              <Text muted className="mt-2">
-                Long-form notes, tutorials, and essays — ready for a subdomain.
-              </Text>
-              <Link
-                href="/blog"
-                className="mt-4 inline-block text-sm font-medium text-olive-400 no-underline hover:text-olive-300"
-              >
-                Read the blog →
-              </Link>
-            </StaggerItem>
-          </Stagger>
-        </Container>
-      </Section>
-
-      <Section className="border-t border-border bg-surface">
-        <Container>
-          <FadeIn>
-            <Heading level={2}>Life gallery</Heading>
-            <Text muted className="mt-2">
-              Moments with captions, powered by Sanity assets.
-            </Text>
-            <Link
-              href="/gallery"
-              className="mt-4 inline-block text-sm font-medium text-olive-400 no-underline hover:text-olive-300"
-            >
-              Open gallery →
-            </Link>
-          </FadeIn>
-        </Container>
-      </Section>
-    </>
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary">
+      <GrainOverlay />
+      <HomeHero settings={settings} />
+      <section
+        id="work"
+        className="scroll-mt-20 bg-canvas-section px-6 py-24 md:px-12 md:py-32"
+      >
+        <FeaturedWorkSection
+          projects={featured}
+          workTitle={settings.workTitle}
+          featuredEmptyMessage={settings.workFeaturedEmptyMessage}
+          liveLabel={settings.workLiveLabel}
+          caseStudyLabel={settings.workCaseStudyLabel}
+        />
+        <HomeArchive
+          archived={archived}
+          ctaLabel={settings.archiveCtaLabel}
+          modalEyebrow={settings.archiveModalEyebrow}
+          modalTitle={settings.archiveModalTitle}
+          modalDescription={settings.archiveModalDescription}
+          gridEmptyMessage={settings.archiveGridEmptyMessage}
+          caseStudyLinkLabel={settings.archiveCaseStudyLinkLabel}
+        />
+      </section>
+      <LifeGallerySection
+        items={gallery}
+        title={settings.lifeTitle}
+        description={settings.lifeDescription}
+        emptyMessage={settings.lifeEmptyMessage}
+      />
+      <AboutSection settings={settings} />
+    </div>
   );
 }
