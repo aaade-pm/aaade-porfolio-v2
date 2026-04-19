@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { RichText } from "@/components/portable-text";
+import { isArticleNewsletterCtaEnabled } from "@/lib/feature-flags";
 import type { PostDetail, PostListItem } from "@/types/sanity";
 
 import { ArticleNewsletterCta } from "./article-newsletter-cta";
@@ -118,7 +119,7 @@ export function ArticleDetail({ post, relatedPosts }: Props) {
         </div>
       ) : null}
 
-      <ArticleNewsletterCta />
+      {isArticleNewsletterCtaEnabled() ? <ArticleNewsletterCta /> : null}
       <ArticleRelatedGrid posts={relatedPosts} />
     </>
   );
